@@ -17,6 +17,20 @@ COPY src ./src
 RUN npm run build
 
 
+# ---- test: install devDependencies, run the (non-browser) automated suite ----
+FROM node:20-bookworm-slim AS test
+WORKDIR /app
+
+COPY package.json package-lock.json ./
+RUN npm ci --ignore-scripts
+
+COPY tsconfig.json vitest.config.ts ./
+COPY src ./src
+COPY test ./test
+
+CMD ["npm", "test"]
+
+
 # ---- runtime ----
 FROM node:20-bookworm-slim AS runtime
 WORKDIR /app
