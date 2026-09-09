@@ -1,0 +1,32 @@
+{
+  "name": "zenon-docs-mcp",
+  "version": "0.1.0",
+  "description": "MCP server exposing the zenon Online Help (onlinehelp.copadata.com) as search/fetch tools, similar to the Microsoft Learn MCP server.",
+  "type": "module",
+  "bin": {
+    "zenon-docs-mcp": "dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "dev": "tsc -p tsconfig.json --watch",
+    "postinstall": "playwright install chromium"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "playwright": "^1.48.0",
+    "turndown": "^7.2.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/turndown": "^5.0.5",
+    "typescript": "^5.6.3"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
