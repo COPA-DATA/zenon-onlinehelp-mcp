@@ -80,6 +80,68 @@ confirm you get results with valid `Content.html?...&id=` URLs, then call
 `zenon_docs_fetch` with one of those URLs and confirm you get back markdown
 content for that topic.
 
+## Running as a remote server (Streamable HTTP)
+
+In addition to stdio, the server can run as a standalone HTTP process
+speaking the MCP Streamable HTTP transport — useful for a shared/remote
+deployment instead of a per-client subprocess. It's stateless (a fresh
+in-process `McpServer` handles each request, same tools as stdio), so
+there's no session state to manage.
+
+```bash
+npm run build
+npm run start:http
+```
+
+This listens on `http://127.0.0.1:3000/mcp` by default. Configure it with
+environment variables:
+
+| Var | Default | Notes |
+|---|---|---|
+| `PORT` | `3000` | Port to listen on |
+| `HOST` | `127.0.0.1` | Bind address. `127.0.0.1`/`localhost`/`::1` get automatic DNS-rebinding protection |
+| `ALLOWED_HOSTS` | — | Comma-separated allowed `Host` header values; use when binding `0.0.0.0` so requests are still validated |
+
+The single endpoint is `POST /mcp` (`GET`/`DELETE` return 405, since this
+is stateless mode — no server-push streams or session termination).
+
+Registering it with a client:
+
+```bash
+claude mcp add --transport http zenon-docs http://localhost:3000/mcp
+```
+
+```json
+{
+  "mcpServers": {
+    "zenon-docs": {
+      "type": "http",
+      "url": "http://localhost:3000/mcp"
+    }
+  }
+}
+```
+
+Verify with a plain JSON-RPC call:
+
+```bash
+curl -s -X POST http://localhost:3000/mcp \
+  -H 'content-type: application/json' \
+  -H 'accept: application/json, text/event-stream' \
+  -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}'
+```
+
+or with the Inspector, pointed at the URL instead of a command:
+
+```bash
+npx @modelcontextprotocol/inspector http://localhost:3000/mcp
+```
+
+**Security note:** there is no built-in authentication, CORS, or OAuth —
+this is a stateless, read-only proxy over public documentation. If you
+expose it beyond `localhost`, put it behind a reverse proxy, VPN, or
+network ACL rather than opening it directly to the internet.
+
 ## Running in Docker
 
 The image bundles Node, the compiled server, and a headless Chromium with
@@ -101,6 +163,21 @@ docker run -i --rm zenon-docs-mcp
 
 That will sit there speaking JSON-RPC on stdin/stdout, which is exactly
 what an MCP client expects — it's not meant to print anything on its own.
+
+### Remote (Streamable HTTP) mode in Docker
+
+Override the default command to boot `dist/http.js` instead, and publish
+the port:
+
+```bash
+docker run -p 3000:3000 -e HOST=0.0.0.0 --rm zenon-docs-mcp dist/http.js
+```
+
+`HOST=0.0.0.0` is required so the server accepts connections from outside
+the container; since that disables the automatic localhost DNS-rebinding
+protection, also set `ALLOWED_HOSTS` (e.g.
+`-e ALLOWED_HOSTS=my.public.hostname`) for any deployment reachable beyond
+your own machine.
 
 ### Registering the container with an MCP client
 

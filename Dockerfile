@@ -1,7 +1,9 @@
 # zenon Docs MCP Server
 #
-# This is a stdio MCP server (JSON-RPC over stdin/stdout), so run it with
-# `docker run -i` (not detached, no TTY needed) — see README.md.
+# Two modes, selected by the command passed at `docker run` time:
+#   - stdio (default): JSON-RPC over stdin/stdout — `docker run -i --rm <image>`
+#   - remote Streamable HTTP: `docker run -p 3000:3000 -e HOST=0.0.0.0 --rm <image> dist/http.js`
+# See README.md.
 
 # ---- builder: compile TypeScript only, no browser download needed here ----
 FROM node:20-bookworm-slim AS builder
@@ -23,6 +25,9 @@ ENV NODE_ENV=production \
     PLAYWRIGHT_BROWSERS_PATH=/ms-playwright \
     PLAYWRIGHT_CHROMIUM_NO_SANDBOX=1
 
+# Only used in remote Streamable HTTP mode (dist/http.js); no-op for stdio.
+EXPOSE 3000
+
 # Production deps only; --ignore-scripts skips the postinstall browser
 # download here since we install Chromium + its OS deps explicitly below
 # (the postinstall script is for local/non-Docker installs).
@@ -43,4 +48,5 @@ RUN groupadd --system app \
     && chown -R app:app /app /ms-playwright
 USER app
 
-ENTRYPOINT ["node", "dist/index.js"]
+ENTRYPOINT ["node"]
+CMD ["dist/index.js"]
