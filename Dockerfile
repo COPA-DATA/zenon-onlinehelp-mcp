@@ -32,6 +32,8 @@ CMD ["npm", "test"]
 
 
 # ---- runtime ----
+# Must stay the last stage: azd's `docker` build has no --target selector, so
+# it always builds whichever stage is last in this file.
 FROM node:20-bookworm-slim AS runtime
 WORKDIR /app
 

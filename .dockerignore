@@ -5,3 +5,10 @@ dist
 README.md
 coverage
 .vitest-cache
+
+# Azure Developer CLI (not needed inside the build context)
+.azure
+infra
+azure.yaml
+*.bicep
+*.bicepparam
