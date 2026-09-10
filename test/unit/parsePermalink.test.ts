@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { parsePermalink } from "../../src/fetchTopic.js";
+import { parsePermalink } from "../../src/sources/zenon/fetchTopic.js";
+import { BASE_URL } from "../../src/sources/zenon/siteApi.js";
 
-const BASE = "https://onlinehelp.copadata.com/Content.html";
+const BASE = `${BASE_URL}/Content.html`;
 
 describe("parsePermalink", () => {
   it("parses a full permalink with all query params", () => {

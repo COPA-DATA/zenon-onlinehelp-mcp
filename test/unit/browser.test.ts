@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { ResolvedTarget } from "../../src/types.js";
+import { ResolvedTarget } from "../../src/sources/zenon/types.js";
 
 // `browser.ts` imports `chromium` directly from "playwright" with no
 // injection seam, so exercising its page-pooling/locking logic requires
@@ -42,7 +42,7 @@ function makeFakeBrowser() {
 // each test a clean instance instead of leaking pooled pages across tests.
 async function freshBrowserModule() {
   vi.resetModules();
-  return import("../../src/browser.js");
+  return import("../../src/sources/zenon/browser.js");
 }
 
 describe("browser withPage/closeBrowser", () => {

@@ -4,9 +4,9 @@
 // tree matching search.ts's selectors and fiber-walking logic). Run with
 // `npm run test:live` after `npx playwright install chromium`.
 import { afterAll, describe, expect, it } from "vitest";
-import { closeBrowser } from "../../src/browser.js";
-import { searchDocs } from "../../src/search.js";
-import { resolveTarget } from "../../src/siteApi.js";
+import { closeBrowser } from "../../src/sources/zenon/browser.js";
+import { searchDocs } from "../../src/sources/zenon/search.js";
+import { resolveTarget } from "../../src/sources/zenon/siteApi.js";
 
 describe("searchDocs (live)", () => {
   afterAll(async () => {

@@ -6,7 +6,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 // the cache from one test can't leak into the next.
 async function freshSiteApi() {
   vi.resetModules();
-  return import("../../src/siteApi.js");
+  return import("../../src/sources/zenon/siteApi.js");
 }
 
 function jsonResponse(body: unknown, ok = true, status = 200) {

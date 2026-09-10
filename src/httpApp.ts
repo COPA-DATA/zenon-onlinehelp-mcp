@@ -2,17 +2,24 @@ import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/
 import { createMcpExpressApp } from "@modelcontextprotocol/sdk/server/express.js";
 import type { Express, Request, Response } from "express";
 import { createServer } from "./mcpServer.js";
+import type { DocSource } from "./docSource.js";
+import { getActiveDocSource } from "./sourceConfig.js";
 
 export interface HttpAppOptions {
   host?: string;
   allowedHosts?: string[];
+  docSource?: DocSource;
 }
 
 export function createHttpApp(options: HttpAppOptions = {}): Express {
+  const docSource = options.docSource ?? getActiveDocSource();
   const app = createMcpExpressApp({ host: options.host, allowedHosts: options.allowedHosts });
 
   app.post("/mcp", async (req: Request, res: Response) => {
-    const server = createServer();
+    // A new McpServer per request (existing behavior), but sharing the one
+    // DocSource instance across all requests so its held resources (e.g.
+    // the zenon source's pooled browser) aren't rebuilt on every call.
+    const server = createServer(docSource);
     try {
       const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
       await server.connect(transport);

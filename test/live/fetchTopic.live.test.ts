@@ -1,10 +1,10 @@
 // Opt-in live-site smoke test, see search.live.test.ts for rationale. Run
 // with `npm run test:live` after `npx playwright install chromium`.
 import { afterAll, describe, expect, it } from "vitest";
-import { closeBrowser } from "../../src/browser.js";
-import { fetchTopic } from "../../src/fetchTopic.js";
-import { searchDocs } from "../../src/search.js";
-import { resolveTarget } from "../../src/siteApi.js";
+import { closeBrowser } from "../../src/sources/zenon/browser.js";
+import { fetchTopic } from "../../src/sources/zenon/fetchTopic.js";
+import { searchDocs } from "../../src/sources/zenon/search.js";
+import { resolveTarget } from "../../src/sources/zenon/siteApi.js";
 
 describe("fetchTopic (live)", () => {
   afterAll(async () => {

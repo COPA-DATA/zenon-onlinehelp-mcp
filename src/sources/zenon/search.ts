@@ -1,7 +1,8 @@
 import { Page } from "playwright";
 import { withPage } from "./browser.js";
 import { BASE_URL } from "./siteApi.js";
-import { ResolvedTarget, SearchResult } from "./types.js";
+import { ResolvedTarget } from "./types.js";
+import { SearchResult } from "../../types.js";
 
 const RESULTS_TIMEOUT_MS = 15_000;
 const MAX_RESULTS = 10;

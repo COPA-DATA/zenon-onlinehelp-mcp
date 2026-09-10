@@ -4,14 +4,14 @@ import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 
 // Mock the modules mcpServer.ts's tool handlers call into, so tests exercise
 // only the wiring/formatting logic, without any real network or browser I/O.
-vi.mock("../../src/siteApi.js", () => ({ resolveTarget: vi.fn() }));
-vi.mock("../../src/search.js", () => ({ searchDocs: vi.fn() }));
-vi.mock("../../src/fetchTopic.js", () => ({ fetchTopic: vi.fn() }));
+vi.mock("../../src/sources/zenon/siteApi.js", () => ({ resolveTarget: vi.fn() }));
+vi.mock("../../src/sources/zenon/search.js", () => ({ searchDocs: vi.fn() }));
+vi.mock("../../src/sources/zenon/fetchTopic.js", () => ({ fetchTopic: vi.fn() }));
 
 import { createServer } from "../../src/mcpServer.js";
-import { resolveTarget } from "../../src/siteApi.js";
-import { searchDocs } from "../../src/search.js";
-import { fetchTopic } from "../../src/fetchTopic.js";
+import { resolveTarget } from "../../src/sources/zenon/siteApi.js";
+import { searchDocs } from "../../src/sources/zenon/search.js";
+import { fetchTopic } from "../../src/sources/zenon/fetchTopic.js";
 
 const resolveTargetMock = vi.mocked(resolveTarget);
 const searchDocsMock = vi.mocked(searchDocs);

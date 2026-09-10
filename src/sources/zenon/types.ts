@@ -1,0 +1,9 @@
+export type Product = "supervisor" | "com" | "addin";
+
+export const PRODUCTS: Product[] = ["supervisor", "com", "addin"];
+
+export interface ResolvedTarget {
+  product: Product;
+  version: string;
+  lang: string;
+}

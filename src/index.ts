@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { closeBrowser } from "./browser.js";
+import { getActiveDocSource } from "./sourceConfig.js";
 import { createServer } from "./mcpServer.js";
 
-const server = createServer();
+const docSource = getActiveDocSource();
+const server = createServer(docSource);
 
 async function main() {
   const transport = new StdioServerTransport();
@@ -11,11 +12,11 @@ async function main() {
 }
 
 process.on("SIGINT", async () => {
-  await closeBrowser();
+  await docSource.close();
   process.exit(0);
 });
 process.on("SIGTERM", async () => {
-  await closeBrowser();
+  await docSource.close();
   process.exit(0);
 });
 

@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { htmlToMarkdown } from "../../src/markdown.js";
-import { ResolvedTarget } from "../../src/types.js";
+import { htmlToMarkdown } from "../../src/sources/zenon/markdown.js";
+import { BASE_URL } from "../../src/sources/zenon/siteApi.js";
+import { ResolvedTarget } from "../../src/sources/zenon/types.js";
 
 const target: ResolvedTarget = { product: "supervisor", version: "1600", lang: "en" };
-const BASE_URL = "https://onlinehelp.copadata.com";
 
 describe("htmlToMarkdown", () => {
   it("converts plain HTML to markdown", () => {

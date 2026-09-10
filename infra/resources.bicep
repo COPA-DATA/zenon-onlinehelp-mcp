@@ -115,6 +115,10 @@ module zenonDocsMcp 'br/public:avm/res/app/container-app:0.8.0' = {
             name: 'HOST'
             value: '0.0.0.0'
           }
+          // To point this deployment at the docs.copatools.com source instead of the
+          // default zenon one, add DOC_SOURCE (value: 'copatools') and, if overriding
+          // the default API host, COPATOOLS_API_BASE_URL here as plain `value:` entries
+          // (both are non-secret).
         ]
       }
     ]

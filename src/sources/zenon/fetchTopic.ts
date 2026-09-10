@@ -2,7 +2,7 @@ import { Page } from "playwright";
 import { withPage } from "./browser.js";
 import { htmlToMarkdown } from "./markdown.js";
 import { BASE_URL, resolveTarget } from "./siteApi.js";
-import { FetchResult } from "./types.js";
+import { FetchResult } from "../../types.js";
 
 const CONTENT_TIMEOUT_MS = 20_000;
 const SETTLE_DELAY_MS = 300;

@@ -15,6 +15,23 @@ This server drives a real headless browser (Playwright/Chromium) against
 the site's own search box and topic viewer to get real answers, live, on
 every call. It does not scrape or mirror the site in bulk.
 
+## Documentation source
+
+The server can point at either of two sources for the same underlying
+zenon documentation, selected via the `DOC_SOURCE` environment variable
+(applies to both stdio and HTTP mode; read once at startup — an unknown
+value crashes immediately with a descriptive error):
+
+| `DOC_SOURCE` | Default | Description |
+|---|---|---|
+| `zenon` | ✅ (default) | `onlinehelp.copadata.com`, driven via headless Chromium as described above. |
+| `copatools` | | `docs.copatools.com`'s public REST API (`api.copatools.com`) — no browser, no auth needed. Same product/version vocabulary as the `zenon` source. Configurable via `COPATOOLS_API_BASE_URL` (default `https://api.copatools.com`). |
+
+The `copatools` source's `zenon_docs_fetch` doesn't yet resolve relative
+image URLs to an absolute link (left as the raw relative path from the API)
+— everything else (search, article content, cross-references) works the
+same as the default source.
+
 ## Tools
 
 ### `zenon_docs_search`
@@ -101,6 +118,8 @@ environment variables:
 | `PORT` | `3000` | Port to listen on |
 | `HOST` | `127.0.0.1` | Bind address. `127.0.0.1`/`localhost`/`::1` get automatic DNS-rebinding protection |
 | `ALLOWED_HOSTS` | — | Comma-separated allowed `Host` header values; use when binding `0.0.0.0` so requests are still validated |
+| `DOC_SOURCE` | `zenon` | See [Documentation source](#documentation-source) above |
+| `COPATOOLS_API_BASE_URL` | `https://api.copatools.com` | Only used when `DOC_SOURCE=copatools` |
 
 The single endpoint is `POST /mcp` (`GET`/`DELETE` return 405, since this
 is stateless mode — no server-push streams or session termination).
@@ -213,6 +232,8 @@ npx @modelcontextprotocol/inspector docker run -i --rm zenon-docs-mcp
   to `src/`, `package.json`, or `package-lock.json` — there's no volume
   mount or live reload.
 - The container launches a real headless Chromium per the same pooling
-  logic as the non-Docker server (see [src/browser.ts](src/browser.ts)), so
-  give it normal container resource limits, not the bare minimum — a
-  starved container will make Playwright navigation time out.
+  logic as the non-Docker server (see
+  [src/sources/zenon/browser.ts](src/sources/zenon/browser.ts)) when using
+  the default `zenon` doc source, so give it normal container resource
+  limits, not the bare minimum — a starved container will make Playwright
+  navigation time out. The `copatools` source needs no browser at all.
