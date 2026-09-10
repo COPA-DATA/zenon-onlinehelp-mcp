@@ -29,7 +29,7 @@ var tags = {
 
 // Organize resources in a resource group
 resource rg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
-  name: 'rg-${environmentName}'
+  name: 'cd-onlinehelp-mcp'
   location: location
   tags: tags
 }
