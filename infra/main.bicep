@@ -12,6 +12,11 @@ param location string
 
 param zenonDocsMcpExists bool
 
+param copatoolsDocsMcpExists bool
+
+@description('Base URL of the copatools API used by the copatools-docs-mcp server')
+param copatoolsApiBaseUrl string = 'https://docs-api-cd.copatools.com'
+
 @description('Id of the user or app to assign application roles')
 param principalId string
 
@@ -43,8 +48,12 @@ module resources 'resources.bicep' = {
     principalId: principalId
     principalType: principalType
     zenonDocsMcpExists: zenonDocsMcpExists
+    copatoolsDocsMcpExists: copatoolsDocsMcpExists
+    copatoolsApiBaseUrl: copatoolsApiBaseUrl
   }
 }
 output AZURE_CONTAINER_REGISTRY_ENDPOINT string = resources.outputs.AZURE_CONTAINER_REGISTRY_ENDPOINT
 output AZURE_RESOURCE_ZENON_DOCS_MCP_ID string = resources.outputs.AZURE_RESOURCE_ZENON_DOCS_MCP_ID
+output AZURE_RESOURCE_COPATOOLS_DOCS_MCP_ID string = resources.outputs.AZURE_RESOURCE_COPATOOLS_DOCS_MCP_ID
 output AZURE_FRONT_DOOR_ENDPOINT string = resources.outputs.AZURE_FRONT_DOOR_ENDPOINT
+output AZURE_FRONT_DOOR_COPATOOLS_ENDPOINT string = resources.outputs.AZURE_FRONT_DOOR_COPATOOLS_ENDPOINT

@@ -11,6 +11,12 @@
       "zenonDocsMcpExists": {
         "value": "${SERVICE_ZENON_DOCS_MCP_RESOURCE_EXISTS=false}"
       },
+      "copatoolsDocsMcpExists": {
+        "value": "${SERVICE_COPATOOLS_DOCS_MCP_RESOURCE_EXISTS=false}"
+      },
+      "copatoolsApiBaseUrl": {
+        "value": "${COPATOOLS_API_BASE_URL=https://docs-api-cd.copatools.com}"
+      },
       "principalId": {
         "value": "${AZURE_PRINCIPAL_ID}"
       },

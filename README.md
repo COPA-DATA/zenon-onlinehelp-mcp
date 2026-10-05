@@ -25,7 +25,7 @@ value crashes immediately with a descriptive error):
 | `DOC_SOURCE` | Default | Description |
 |---|---|---|
 | `zenon` | ✅ (default) | `onlinehelp.copadata.com`, driven via headless Chromium as described above. |
-| `copatools` | | `docs.copatools.com`'s public REST API (`api.copatools.com`) — no browser, no auth needed. Same product/version vocabulary as the `zenon` source. Configurable via `COPATOOLS_API_BASE_URL` (default `https://api.copatools.com`). |
+| `copatools` | | `docs.copatools.com`'s public REST API (`docs-api-cd.copatools.com`) — no browser, no auth needed. Same product/version vocabulary as the `zenon` source. Configurable via `COPATOOLS_API_BASE_URL` (default `https://docs-api-cd.copatools.com`). |
 
 The `copatools` source's `zenon_docs_fetch` doesn't yet resolve relative
 image URLs to an absolute link (left as the raw relative path from the API)
@@ -120,7 +120,7 @@ environment variables:
 | `ALLOWED_HOSTS` | — | Comma-separated allowed `Host` header values; use when binding `0.0.0.0` so requests are still validated |
 | `FRONT_DOOR_ID` | — | Azure Front Door profile ID; when set, requests without a matching `X-Azure-FDID` header get 403 (set automatically by the azd deployment) |
 | `DOC_SOURCE` | `zenon` | See [Documentation source](#documentation-source) above |
-| `COPATOOLS_API_BASE_URL` | `https://api.copatools.com` | Only used when `DOC_SOURCE=copatools` |
+| `COPATOOLS_API_BASE_URL` | `https://docs-api-cd.copatools.com` | Only used when `DOC_SOURCE=copatools` |
 
 The single endpoint is `POST /mcp` (`GET`/`DELETE` return 405, since this
 is stateless mode — no server-push streams or session termination).
@@ -241,13 +241,22 @@ npx @modelcontextprotocol/inspector docker run -i --rm zenon-docs-mcp
 
 ## Deploying to Azure
 
-`azd up` provisions the server on Azure Container Apps (see [infra/](infra/))
-behind **Azure Front Door Standard**:
+`azd up` provisions two MCP servers on Azure Container Apps (see
+[infra/](infra/)), both built from this image and each behind its own
+endpoint on one **Azure Front Door Standard** profile:
 
-- The public MCP URL is the `AZURE_FRONT_DOOR_ENDPOINT` output
-  (`https://<endpoint>.azurefd.net/mcp`; see `azd env get-values`). A new
-  Front Door endpoint can take several minutes to start serving.
-- The Container App only accepts requests carrying this Front Door
+| Container App | `DOC_SOURCE` | Public MCP URL (azd output) |
+|---|---|---|
+| `zenon-docs-mcp` | `zenon` | `AZURE_FRONT_DOOR_ENDPOINT` |
+| `copatools-docs-mcp` | `copatools` | `AZURE_FRONT_DOOR_COPATOOLS_ENDPOINT` |
+
+- Both URLs have the form `https://<endpoint>.azurefd.net/mcp`; see
+  `azd env get-values`. A new Front Door endpoint can take several minutes
+  (occasionally over half an hour) to start serving.
+- The copatools server's API base URL defaults to `https://docs-api-cd.copatools.com`;
+  override it with `azd env set COPATOOLS_API_BASE_URL <url>` followed by
+  `azd provision`.
+- Each Container App only accepts requests carrying this Front Door
   profile's `X-Azure-FDID` header (`FRONT_DOOR_ID`) and the origin `Host`
   (`ALLOWED_HOSTS`), so the direct `*.azurecontainerapps.io` URL returns 403.
 - A WAF policy blocks client IPs that exceed 300 requests per minute
@@ -258,4 +267,5 @@ behind **Azure Front Door Standard**:
 
 ```bash
 claude mcp add --transport http zenon-docs-azure https://<endpoint>.azurefd.net/mcp
+claude mcp add --transport http copatools-docs-azure https://<copatools-endpoint>.azurefd.net/mcp
 ```

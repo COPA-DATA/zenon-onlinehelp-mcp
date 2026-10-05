@@ -7,6 +7,11 @@ param tags object = {}
 
 param zenonDocsMcpExists bool
 
+param copatoolsDocsMcpExists bool
+
+@description('Base URL of the copatools API used by the copatools-docs-mcp server')
+param copatoolsApiBaseUrl string
+
 @description('Id of the user or app to assign application roles')
 param principalId string
 
@@ -56,18 +61,35 @@ module containerAppsEnvironment 'br/public:avm/res/app/managed-environment:0.4.5
   }
 }
 
-// The Container App's FQDN is deterministic, so Front Door can be deployed before the
-// app itself and hand its profile ID to the app's FRONT_DOOR_ID env var without a cycle.
+// The Container Apps' FQDNs are deterministic, so Front Door can be deployed before the
+// apps themselves and hand its profile ID to their FRONT_DOOR_ID env var without a cycle.
 var zenonDocsMcpFqdn = 'zenon-docs-mcp.${containerAppsEnvironment.outputs.defaultDomain}'
+var copatoolsDocsMcpFqdn = 'copatools-docs-mcp.${containerAppsEnvironment.outputs.defaultDomain}'
 
-// Azure Front Door (Standard) with a rate-limiting WAF policy in front of the Container App
+// Azure Front Door (Standard) with a rate-limiting WAF policy in front of the Container Apps,
+// one endpoint per MCP server. The zenon entry keeps its original child names so existing
+// deployments are updated in place.
 module frontDoor './modules/front-door.bicep' = {
   name: 'front-door'
   params: {
     profileName: '${abbrs.cdnProfiles}${resourceToken}'
-    endpointName: '${abbrs.cdnProfilesEndpoints}${resourceToken}'
     wafPolicyName: replace('${abbrs.networkFrontdoorWebApplicationFirewallPolicies}${resourceToken}', '-', '')
-    originHostName: zenonDocsMcpFqdn
+    endpoints: [
+      {
+        endpointName: '${abbrs.cdnProfilesEndpoints}${resourceToken}'
+        originGroupName: 'mcp-origins'
+        originName: 'container-app'
+        routeName: 'mcp-route'
+        originHostName: zenonDocsMcpFqdn
+      }
+      {
+        endpointName: '${abbrs.cdnProfilesEndpoints}copatools-${resourceToken}'
+        originGroupName: 'copatools-origins'
+        originName: 'copatools-app'
+        routeName: 'copatools-route'
+        originHostName: copatoolsDocsMcpFqdn
+      }
+    ]
     tags: tags
   }
 }
@@ -143,10 +165,7 @@ module zenonDocsMcp 'br/public:avm/res/app/container-app:0.8.0' = {
             name: 'ALLOWED_HOSTS'
             value: zenonDocsMcpFqdn
           }
-          // To point this deployment at the docs.copatools.com source instead of the
-          // default zenon one, add DOC_SOURCE (value: 'copatools') and, if overriding
-          // the default API host, COPATOOLS_API_BASE_URL here as plain `value:` entries
-          // (both are non-secret).
+          // The docs.copatools.com source runs as its own app: see copatoolsDocsMcp below.
         ]
       }
     ]
@@ -165,6 +184,93 @@ module zenonDocsMcp 'br/public:avm/res/app/container-app:0.8.0' = {
     tags: union(tags, { 'azd-service-name': 'zenon-docs-mcp' })
   }
 }
+// Second MCP server: same image, configured for the docs.copatools.com REST API source.
+module copatoolsDocsMcpFetchLatestImage './modules/fetch-container-image.bicep' = {
+  name: 'copatoolsDocsMcp-fetch-image'
+  params: {
+    exists: copatoolsDocsMcpExists
+    name: 'copatools-docs-mcp'
+  }
+}
+
+module copatoolsDocsMcp 'br/public:avm/res/app/container-app:0.8.0' = {
+  name: 'copatoolsDocsMcp'
+  params: {
+    name: 'copatools-docs-mcp'
+    ingressExternal: true
+    ingressTargetPort: 3000
+    ingressTransport: 'auto'
+    scaleMinReplicas: 1
+    scaleMaxReplicas: 3
+    secrets: {
+      secureList:  [
+      ]
+    }
+    containers: [
+      {
+        image: copatoolsDocsMcpFetchLatestImage.outputs.?containers[?0].?image ?? 'mcr.microsoft.com/azuredocs/containerapps-helloworld:latest'
+        name: 'main'
+        args: [
+          'dist/http.js'
+        ]
+        resources: {
+          // No headless browser for this source, so a smaller size is enough.
+          cpu: json('0.5')
+          memory: '1.0Gi'
+        }
+        env: [
+          {
+            name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
+            value: monitoring.outputs.applicationInsightsConnectionString
+          }
+          {
+            name: 'AZURE_CLIENT_ID'
+            value: zenonDocsMcpIdentity.outputs.clientId
+          }
+          {
+            name: 'PORT'
+            value: '3000'
+          }
+          {
+            name: 'HOST'
+            value: '0.0.0.0'
+          }
+          {
+            name: 'FRONT_DOOR_ID'
+            value: frontDoor.outputs.frontDoorId
+          }
+          {
+            name: 'ALLOWED_HOSTS'
+            value: copatoolsDocsMcpFqdn
+          }
+          {
+            name: 'DOC_SOURCE'
+            value: 'copatools'
+          }
+          {
+            name: 'COPATOOLS_API_BASE_URL'
+            value: copatoolsApiBaseUrl
+          }
+        ]
+      }
+    ]
+    managedIdentities:{
+      systemAssigned: false
+      userAssignedResourceIds: [zenonDocsMcpIdentity.outputs.resourceId]
+    }
+    registries:[
+      {
+        server: containerRegistry.outputs.loginServer
+        identity: zenonDocsMcpIdentity.outputs.resourceId
+      }
+    ]
+    environmentResourceId: containerAppsEnvironment.outputs.resourceId
+    location: location
+    tags: union(tags, { 'azd-service-name': 'copatools-docs-mcp' })
+  }
+}
 output AZURE_CONTAINER_REGISTRY_ENDPOINT string = containerRegistry.outputs.loginServer
 output AZURE_RESOURCE_ZENON_DOCS_MCP_ID string = zenonDocsMcp.outputs.resourceId
-output AZURE_FRONT_DOOR_ENDPOINT string = 'https://${frontDoor.outputs.endpointHostName}/mcp'
+output AZURE_RESOURCE_COPATOOLS_DOCS_MCP_ID string = copatoolsDocsMcp.outputs.resourceId
+output AZURE_FRONT_DOOR_ENDPOINT string = 'https://${frontDoor.outputs.endpointHostNames[0]}/mcp'
+output AZURE_FRONT_DOOR_COPATOOLS_ENDPOINT string = 'https://${frontDoor.outputs.endpointHostNames[1]}/mcp'

@@ -1,17 +1,14 @@
 @description('Name of the Front Door profile')
 param profileName string
 
-@description('Name of the Front Door endpoint')
-param endpointName string
+@description('One Front Door endpoint per MCP server: { endpointName, originGroupName, originName, routeName, originHostName }')
+param endpoints array
 
 @description('Name of the WAF policy (alphanumeric only)')
 param wafPolicyName string
 
 @description('Tags that will be applied to all resources')
 param tags object = {}
-
-@description('Host name of the origin (the Container App FQDN)')
-param originHostName string
 
 @description('WAF mode')
 @allowed([
@@ -36,19 +33,19 @@ resource profile 'Microsoft.Cdn/profiles@2024-02-01' = {
   }
 }
 
-resource endpoint 'Microsoft.Cdn/profiles/afdEndpoints@2024-02-01' = {
+resource endpoint 'Microsoft.Cdn/profiles/afdEndpoints@2024-02-01' = [for e in endpoints: {
   parent: profile
-  name: endpointName
+  name: e.endpointName
   location: 'global'
   tags: tags
   properties: {
     enabledState: 'Enabled'
   }
-}
+}]
 
-resource originGroup 'Microsoft.Cdn/profiles/originGroups@2024-02-01' = {
+resource originGroup 'Microsoft.Cdn/profiles/originGroups@2024-02-01' = [for e in endpoints: {
   parent: profile
-  name: 'mcp-origins'
+  name: e.originGroupName
   properties: {
     loadBalancingSettings: {
       sampleSize: 4
@@ -59,14 +56,14 @@ resource originGroup 'Microsoft.Cdn/profiles/originGroups@2024-02-01' = {
     // rejected by the app's X-Azure-FDID check anyway.
     sessionAffinityState: 'Disabled'
   }
-}
+}]
 
-resource origin 'Microsoft.Cdn/profiles/originGroups/origins@2024-02-01' = {
-  parent: originGroup
-  name: 'container-app'
+resource origin 'Microsoft.Cdn/profiles/originGroups/origins@2024-02-01' = [for (e, i) in endpoints: {
+  parent: originGroup[i]
+  name: e.originName
   properties: {
-    hostName: originHostName
-    originHostHeader: originHostName
+    hostName: e.originHostName
+    originHostHeader: e.originHostName
     httpPort: 80
     httpsPort: 443
     priority: 1
@@ -74,14 +71,14 @@ resource origin 'Microsoft.Cdn/profiles/originGroups/origins@2024-02-01' = {
     enabledState: 'Enabled'
     enforceCertificateNameCheck: true
   }
-}
+}]
 
-resource route 'Microsoft.Cdn/profiles/afdEndpoints/routes@2024-02-01' = {
-  parent: endpoint
-  name: 'mcp-route'
+resource route 'Microsoft.Cdn/profiles/afdEndpoints/routes@2024-02-01' = [for (e, i) in endpoints: {
+  parent: endpoint[i]
+  name: e.routeName
   properties: {
     originGroup: {
-      id: originGroup.id
+      id: originGroup[i].id
     }
     supportedProtocols: [
       'Https'
@@ -96,9 +93,9 @@ resource route 'Microsoft.Cdn/profiles/afdEndpoints/routes@2024-02-01' = {
     // No cacheConfiguration: caching and compression stay off so SSE responses stream through.
   }
   dependsOn: [
-    origin
+    origin[i]
   ]
-}
+}]
 
 resource wafPolicy 'Microsoft.Network/FrontDoorWebApplicationFirewallPolicies@2024-02-01' = {
   name: wafPolicyName
@@ -156,11 +153,9 @@ resource securityPolicy 'Microsoft.Cdn/profiles/securityPolicies@2024-02-01' = {
       }
       associations: [
         {
-          domains: [
-            {
-              id: endpoint.id
-            }
-          ]
+          domains: [for (e, i) in endpoints: {
+            id: endpoint[i].id
+          }]
           patternsToMatch: [
             '/*'
           ]
@@ -171,4 +166,4 @@ resource securityPolicy 'Microsoft.Cdn/profiles/securityPolicies@2024-02-01' = {
 }
 
 output frontDoorId string = profile.properties.frontDoorId
-output endpointHostName string = endpoint.properties.hostName
+output endpointHostNames array = [for (e, i) in endpoints: endpoint[i].properties.hostName]

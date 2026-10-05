@@ -12,7 +12,18 @@ services:
             path: Dockerfile
             context: .
             remoteBuild: true
+    copatools-docs-mcp:
+        project: .
+        host: containerapp
+        language: ts
+        docker:
+            path: Dockerfile
+            context: .
+            remoteBuild: true
 resources:
     zenon-docs-mcp:
+        type: host.containerapp
+        port: 3000
+    copatools-docs-mcp:
         type: host.containerapp
         port: 3000
