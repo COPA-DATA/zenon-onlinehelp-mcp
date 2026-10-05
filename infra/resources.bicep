@@ -56,6 +56,22 @@ module containerAppsEnvironment 'br/public:avm/res/app/managed-environment:0.4.5
   }
 }
 
+// The Container App's FQDN is deterministic, so Front Door can be deployed before the
+// app itself and hand its profile ID to the app's FRONT_DOOR_ID env var without a cycle.
+var zenonDocsMcpFqdn = 'zenon-docs-mcp.${containerAppsEnvironment.outputs.defaultDomain}'
+
+// Azure Front Door (Standard) with a rate-limiting WAF policy in front of the Container App
+module frontDoor './modules/front-door.bicep' = {
+  name: 'front-door'
+  params: {
+    profileName: '${abbrs.cdnProfiles}${resourceToken}'
+    endpointName: '${abbrs.cdnProfilesEndpoints}${resourceToken}'
+    wafPolicyName: replace('${abbrs.networkFrontdoorWebApplicationFirewallPolicies}${resourceToken}', '-', '')
+    originHostName: zenonDocsMcpFqdn
+    tags: tags
+  }
+}
+
 module zenonDocsMcpIdentity 'br/public:avm/res/managed-identity/user-assigned-identity:0.2.1' = {
   name: 'zenonDocsMcpidentity'
   params: {
@@ -115,6 +131,18 @@ module zenonDocsMcp 'br/public:avm/res/app/container-app:0.8.0' = {
             name: 'HOST'
             value: '0.0.0.0'
           }
+          {
+            // Requests without this profile's X-Azure-FDID header are rejected (403),
+            // so the direct *.azurecontainerapps.io URL can't bypass Front Door.
+            name: 'FRONT_DOOR_ID'
+            value: frontDoor.outputs.frontDoorId
+          }
+          {
+            // Front Door forwards the origin FQDN as Host; validating it restores the
+            // DNS-rebinding protection that HOST=0.0.0.0 otherwise disables.
+            name: 'ALLOWED_HOSTS'
+            value: zenonDocsMcpFqdn
+          }
           // To point this deployment at the docs.copatools.com source instead of the
           // default zenon one, add DOC_SOURCE (value: 'copatools') and, if overriding
           // the default API host, COPATOOLS_API_BASE_URL here as plain `value:` entries
@@ -139,3 +167,4 @@ module zenonDocsMcp 'br/public:avm/res/app/container-app:0.8.0' = {
 }
 output AZURE_CONTAINER_REGISTRY_ENDPOINT string = containerRegistry.outputs.loginServer
 output AZURE_RESOURCE_ZENON_DOCS_MCP_ID string = zenonDocsMcp.outputs.resourceId
+output AZURE_FRONT_DOOR_ENDPOINT string = 'https://${frontDoor.outputs.endpointHostName}/mcp'

@@ -151,4 +151,51 @@ describe("HTTP /mcp", () => {
       expect(content[0]?.text).toContain('Unknown version "bogus" for product "supervisor"');
     });
   });
+
+  describe("Front Door lockdown (frontDoorId)", () => {
+    const FRONT_DOOR_ID = "11111111-2222-3333-4444-555555555555";
+    const TOOLS_LIST = { jsonrpc: "2.0", id: 1, method: "tools/list" };
+    const FORBIDDEN = { jsonrpc: "2.0", error: { code: -32000, message: "Forbidden." }, id: null };
+
+    it("rejects requests without an X-Azure-FDID header with 403", async () => {
+      const app = createHttpApp({ frontDoorId: FRONT_DOOR_ID });
+      const res = await request(app).post("/mcp").set(JSON_RPC_HEADERS).send(TOOLS_LIST);
+
+      expect(res.status).toBe(403);
+      expect(JSON.parse(res.text)).toEqual(FORBIDDEN);
+    });
+
+    it("rejects requests with a different X-Azure-FDID with 403", async () => {
+      const app = createHttpApp({ frontDoorId: FRONT_DOOR_ID });
+      const res = await request(app)
+        .post("/mcp")
+        .set(JSON_RPC_HEADERS)
+        .set("X-Azure-FDID", "00000000-0000-0000-0000-000000000000")
+        .send(TOOLS_LIST);
+
+      expect(res.status).toBe(403);
+      expect(JSON.parse(res.text)).toEqual(FORBIDDEN);
+    });
+
+    it("serves requests carrying the matching X-Azure-FDID", async () => {
+      const app = createHttpApp({ frontDoorId: FRONT_DOOR_ID });
+      const res = await request(app)
+        .post("/mcp")
+        .set(JSON_RPC_HEADERS)
+        .set("X-Azure-FDID", FRONT_DOOR_ID)
+        .send(TOOLS_LIST);
+
+      expect(res.status).toBe(200);
+      const body = parseJsonRpcBody(res);
+      const names = (body.result.tools as Array<{ name: string }>).map((t) => t.name);
+      expect(names).toContain("zenon_docs_search");
+    });
+
+    it("does not check the header when frontDoorId is unset", async () => {
+      const app = createHttpApp();
+      const res = await request(app).post("/mcp").set(JSON_RPC_HEADERS).send(TOOLS_LIST);
+
+      expect(res.status).toBe(200);
+    });
+  });
 });

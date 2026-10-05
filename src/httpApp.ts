@@ -1,6 +1,6 @@
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { createMcpExpressApp } from "@modelcontextprotocol/sdk/server/express.js";
-import type { Express, Request, Response } from "express";
+import type { Express, NextFunction, Request, Response } from "express";
 import { createServer } from "./mcpServer.js";
 import type { DocSource } from "./docSource.js";
 import { getActiveDocSource } from "./sourceConfig.js";
@@ -8,12 +8,29 @@ import { getActiveDocSource } from "./sourceConfig.js";
 export interface HttpAppOptions {
   host?: string;
   allowedHosts?: string[];
+  /** When set, requests must carry a matching X-Azure-FDID header (Azure Front Door lockdown). */
+  frontDoorId?: string;
   docSource?: DocSource;
 }
 
 export function createHttpApp(options: HttpAppOptions = {}): Express {
   const docSource = options.docSource ?? getActiveDocSource();
   const app = createMcpExpressApp({ host: options.host, allowedHosts: options.allowedHosts });
+
+  if (options.frontDoorId) {
+    const frontDoorId = options.frontDoorId;
+    app.use((req: Request, res: Response, next: NextFunction) => {
+      if (req.header("x-azure-fdid") !== frontDoorId) {
+        res.status(403).json({
+          jsonrpc: "2.0",
+          error: { code: -32000, message: "Forbidden." },
+          id: null,
+        });
+        return;
+      }
+      next();
+    });
+  }
 
   app.post("/mcp", async (req: Request, res: Response) => {
     // A new McpServer per request (existing behavior), but sharing the one

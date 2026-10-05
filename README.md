@@ -118,6 +118,7 @@ environment variables:
 | `PORT` | `3000` | Port to listen on |
 | `HOST` | `127.0.0.1` | Bind address. `127.0.0.1`/`localhost`/`::1` get automatic DNS-rebinding protection |
 | `ALLOWED_HOSTS` | — | Comma-separated allowed `Host` header values; use when binding `0.0.0.0` so requests are still validated |
+| `FRONT_DOOR_ID` | — | Azure Front Door profile ID; when set, requests without a matching `X-Azure-FDID` header get 403 (set automatically by the azd deployment) |
 | `DOC_SOURCE` | `zenon` | See [Documentation source](#documentation-source) above |
 | `COPATOOLS_API_BASE_URL` | `https://api.copatools.com` | Only used when `DOC_SOURCE=copatools` |
 
@@ -237,3 +238,24 @@ npx @modelcontextprotocol/inspector docker run -i --rm zenon-docs-mcp
   the default `zenon` doc source, so give it normal container resource
   limits, not the bare minimum — a starved container will make Playwright
   navigation time out. The `copatools` source needs no browser at all.
+
+## Deploying to Azure
+
+`azd up` provisions the server on Azure Container Apps (see [infra/](infra/))
+behind **Azure Front Door Standard**:
+
+- The public MCP URL is the `AZURE_FRONT_DOOR_ENDPOINT` output
+  (`https://<endpoint>.azurefd.net/mcp`; see `azd env get-values`). A new
+  Front Door endpoint can take several minutes to start serving.
+- The Container App only accepts requests carrying this Front Door
+  profile's `X-Azure-FDID` header (`FRONT_DOOR_ID`) and the origin `Host`
+  (`ALLOWED_HOSTS`), so the direct `*.azurecontainerapps.io` URL returns 403.
+- A WAF policy blocks client IPs that exceed 300 requests per minute
+  (`rateLimitPerMinute` in [infra/modules/front-door.bicep](infra/modules/front-door.bicep)).
+  Managed WAF rule sets would require the Premium tier.
+- Front Door's origin response timeout is raised to 120s to leave room for
+  slow Playwright-backed `zenon_docs_fetch` calls.
+
+```bash
+claude mcp add --transport http zenon-docs-azure https://<endpoint>.azurefd.net/mcp
+```
