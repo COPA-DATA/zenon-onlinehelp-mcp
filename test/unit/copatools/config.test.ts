@@ -12,9 +12,9 @@ afterEach(() => {
 });
 
 describe("getCopatoolsConfig", () => {
-  it("defaults apiBaseUrl to https://api.copatools.com", () => {
+  it("defaults apiBaseUrl to https://docs-api-cd.copatools.com", () => {
     delete process.env.COPATOOLS_API_BASE_URL;
-    expect(getCopatoolsConfig().apiBaseUrl).toBe("https://api.copatools.com");
+    expect(getCopatoolsConfig().apiBaseUrl).toBe("https://docs-api-cd.copatools.com");
   });
 
   it("honors an env override", () => {

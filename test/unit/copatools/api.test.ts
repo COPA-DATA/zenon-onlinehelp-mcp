@@ -18,7 +18,7 @@ describe("copatools api", () => {
     const versions = await getVersions();
 
     expect(versions).toEqual([{ code: "1600" }]);
-    expect(mockFetch).toHaveBeenCalledWith("https://api.copatools.com/admin/versions");
+    expect(mockFetch).toHaveBeenCalledWith("https://docs-api-cd.copatools.com/admin/versions");
   });
 
   it("getToc fetches /toc with product/ver/lang query params", async () => {

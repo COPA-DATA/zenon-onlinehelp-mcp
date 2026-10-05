@@ -1,4 +1,4 @@
-// Opt-in live-site smoke test: hits the real, public api.copatools.com REST
+// Opt-in live-site smoke test: hits the real, public docs-api-cd.copatools.com REST
 // API directly (no browser, no auth needed). Not run by `npm test` (network-
 // dependent). Run with `npm run test:live`.
 import { describe, expect, it } from "vitest";
