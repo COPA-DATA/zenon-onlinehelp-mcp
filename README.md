@@ -269,3 +269,7 @@ endpoint on one **Azure Front Door Standard** profile:
 claude mcp add --transport http zenon-docs-azure https://<endpoint>.azurefd.net/mcp
 claude mcp add --transport http copatools-docs-azure https://<copatools-endpoint>.azurefd.net/mcp
 ```
+
+## License
+
+[MIT](LICENSE) © 2026 Ing. Punzenberger COPA-DATA GmbH

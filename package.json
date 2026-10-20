@@ -2,6 +2,7 @@
   "name": "zenon-docs-mcp",
   "version": "0.1.0",
   "description": "MCP server exposing the zenon Online Help (onlinehelp.copadata.com) as search/fetch tools, similar to the Microsoft Learn MCP server.",
+  "license": "MIT",
   "type": "module",
   "bin": {
     "zenon-docs-mcp": "dist/index.js"
