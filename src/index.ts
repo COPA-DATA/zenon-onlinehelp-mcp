@@ -1,4 +1,7 @@
 #!/usr/bin/env node
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2026 Ing. Punzenberger COPA-DATA GmbH
+
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { getActiveDocSource } from "./sourceConfig.js";
 import { createServer } from "./mcpServer.js";

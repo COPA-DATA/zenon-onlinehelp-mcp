@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2026 Ing. Punzenberger COPA-DATA GmbH
+
 // Opt-in live-site smoke test: launches a real Chromium via Playwright and
 // hits the real onlinehelp.copadata.com site. Not run by `npm test` or in
 // Docker (slow, network-dependent, and depends on the real site's DOM/React

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2026 Ing. Punzenberger COPA-DATA GmbH
+
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getVersions, getToc, getArticle, search } from "../../../src/sources/copatools/api.js";
 

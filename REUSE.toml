@@ -1,0 +1,22 @@
+version = 1
+
+[[annotations]]
+path = [
+  "package.json",
+  "package-lock.json",
+  "tsconfig.json",
+  "azure.yaml",
+  "Dockerfile",
+  ".dockerignore",
+  ".gitignore",
+  "README.md",
+  "SECURITY.md",
+  "CONTRIBUTING.md",
+  "next-steps.md",
+  "REUSE.toml",
+  "infra/**",
+  ".github/**",
+]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 Ing. Punzenberger COPA-DATA GmbH"
+SPDX-License-Identifier = "MIT"

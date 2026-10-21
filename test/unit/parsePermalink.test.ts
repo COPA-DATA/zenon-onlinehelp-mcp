@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2026 Ing. Punzenberger COPA-DATA GmbH
+
 import { describe, expect, it } from "vitest";
 import { parsePermalink } from "../../src/sources/zenon/fetchTopic.js";
 import { BASE_URL } from "../../src/sources/zenon/siteApi.js";

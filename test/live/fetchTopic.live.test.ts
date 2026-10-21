@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2026 Ing. Punzenberger COPA-DATA GmbH
+
 // Opt-in live-site smoke test, see search.live.test.ts for rationale. Run
 // with `npm run test:live` after `npx playwright install chromium`.
 import { afterAll, describe, expect, it } from "vitest";

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2026 Ing. Punzenberger COPA-DATA GmbH
+
 import { chromium, Browser, Page } from "playwright";
 import { BASE_URL } from "./siteApi.js";
 import { ResolvedTarget } from "./types.js";

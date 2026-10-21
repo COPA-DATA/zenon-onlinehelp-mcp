@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2026 Ing. Punzenberger COPA-DATA GmbH
+
 // Opt-in live-site smoke test: hits the real, public docs-api-cd.copatools.com REST
 // API directly (no browser, no auth needed). Not run by `npm test` (network-
 // dependent). Run with `npm run test:live`.

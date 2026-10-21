@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2026 Ing. Punzenberger COPA-DATA GmbH
+
 import { PRODUCTS, Product, ResolvedTarget } from "./types.js";
 
 export const BASE_URL = "https://onlinehelp.copadata.com";

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2026 Ing. Punzenberger COPA-DATA GmbH
+
 // Response shapes confirmed live against api.copatools.com (the public REST
 // API backing the docs.copatools.com "COPA-DATA Docs" site) during
 // investigation — not guessed.
