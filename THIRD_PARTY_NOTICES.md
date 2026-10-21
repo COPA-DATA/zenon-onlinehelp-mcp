@@ -122,4 +122,4 @@ Total: 96 packages.
 ## Browser and container components
 
 - **Chromium:** Playwright downloads a Chromium build (`playwright install chromium`, and inside the Docker image). Chromium is distributed under the BSD-3-Clause license and the licenses of its own bundled components. See <https://www.chromium.org/chromium-os/licenses/> and the licenses shipped with the downloaded browser.
-- **Docker base image:** the container image is based on `node:20-bookworm-slim` (Debian). The Node.js runtime and Debian packages carry their own licenses. See <https://github.com/nodejs/node/blob/main/LICENSE> and the files under `/usr/share/doc/*/copyright` in the image.
+- **Docker base image:** the container image is based on `node:24-bookworm-slim` (Debian). The Node.js runtime and Debian packages carry their own licenses. See <https://github.com/nodejs/node/blob/main/LICENSE> and the files under `/usr/share/doc/*/copyright` in the image.
