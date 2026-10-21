@@ -6,7 +6,7 @@
 # See README.md.
 
 # ---- builder: compile TypeScript only, no browser download needed here ----
-FROM node:24-bookworm-slim AS builder
+FROM node:25-bookworm-slim AS builder
 WORKDIR /app
 
 COPY package.json package-lock.json ./
@@ -18,7 +18,7 @@ RUN npm run build
 
 
 # ---- test: install devDependencies, run the (non-browser) automated suite ----
-FROM node:24-bookworm-slim AS test
+FROM node:25-bookworm-slim AS test
 WORKDIR /app
 
 COPY package.json package-lock.json ./
@@ -34,7 +34,7 @@ CMD ["npm", "test"]
 # ---- runtime ----
 # Must stay the last stage: azd's `docker` build has no --target selector, so
 # it always builds whichever stage is last in this file.
-FROM node:24-bookworm-slim AS runtime
+FROM node:25-bookworm-slim AS runtime
 WORKDIR /app
 
 ENV NODE_ENV=production \
