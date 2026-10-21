@@ -276,6 +276,17 @@ claude mcp add --transport http zenon-docs-azure https://<endpoint>.azurefd.net/
 claude mcp add --transport http copatools-docs-azure https://<copatools-endpoint>.azurefd.net/mcp
 ```
 
+### Troubleshooting a deployment
+
+If an endpoint shows a blank page, a generic welcome page or an error, the service may have failed to start or may be missing configuration. A new Front Door endpoint can also take several minutes to start serving (see above).
+
+1. Run `azd show` and open the resource group through the "View in Azure Portal" link.
+2. Open the failing Container App and select the failing revision under "Revisions with Issues".
+3. Read the status details, then the console log stream and the system log stream.
+4. Use the app's **Console** to open a shell in the running container if you need to look further.
+
+More help: [Container Apps troubleshooting](https://learn.microsoft.com/azure/container-apps/troubleshooting). To track cost, see [Azure billing overview](https://learn.microsoft.com/azure/developer/intro/azure-developer-billing).
+
 ## Documentation content
 
 This repository contains the **code** of an MCP server only. The [MIT license](LICENSE) applies to that code.

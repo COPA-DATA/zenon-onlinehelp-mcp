@@ -12,7 +12,6 @@ path = [
   "README.md",
   "SECURITY.md",
   "CONTRIBUTING.md",
-  "next-steps.md",
   "REUSE.toml",
   "infra/**",
   ".github/**",
