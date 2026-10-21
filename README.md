@@ -6,6 +6,12 @@ the same way the Microsoft Learn MCP server exposes Microsoft/Azure docs:
 a `search` tool for grounded, cited hits and a `fetch` tool for pulling a
 specific topic's full content.
 
+## Status and support
+
+This is an open-source tool published by COPA-DATA. It is not a zenon product and is not covered by any COPA-DATA support or maintenance agreement. Support is best-effort, through GitHub issues only.
+
+This software is provided "as is", without warranty of any kind (see [LICENSE](LICENSE)). Answers returned by this server are excerpts of the zenon documentation. They are not a substitute for the official documentation or for COPA-DATA's technical support. Check anything safety-relevant or production-critical against the source documentation, particularly when an AI assistant has summarized it.
+
 ## Why this exists
 
 `onlinehelp.copadata.com` is a JavaScript single-page app with no public
@@ -269,6 +275,36 @@ endpoint on one **Azure Front Door Standard** profile:
 claude mcp add --transport http zenon-docs-azure https://<endpoint>.azurefd.net/mcp
 claude mcp add --transport http copatools-docs-azure https://<copatools-endpoint>.azurefd.net/mcp
 ```
+
+## Documentation content
+
+This repository contains the **code** of an MCP server only. The [MIT license](LICENSE) applies to that code.
+
+The zenon documentation that the server retrieves from [onlinehelp.copadata.com](https://onlinehelp.copadata.com/) and [docs.copatools.com](https://docs.copatools.com/) is **not** part of this repository and is **not** covered by the MIT license. The documentation is copyright © Ing. Punzenberger COPA-DATA GmbH and remains subject to the terms of use of those websites. Content is fetched live on each request. This repository does not include a copy or mirror of the documentation, and you must not use this server to build one.
+
+If you operate this server, you are responsible for complying with the terms of use of the documentation sites, including any limits on automated access. Please keep request volumes modest.
+
+## Trademarks
+
+"zenon", "COPA-DATA" and the associated logos are trademarks or registered trademarks of Ing. Punzenberger COPA-DATA GmbH. The MIT license does not grant any right to use these marks. Forks and derived projects must not use them in a way that suggests endorsement by, or affiliation with, COPA-DATA. Other product names mentioned are the property of their respective owners.
+
+## Third-party software
+
+This project depends on third-party open-source packages (see `package.json` and `package-lock.json`), each under its own license. The Docker image and the `postinstall` step additionally download Chromium through Playwright, which is distributed under its own licenses.
+
+## Security
+
+This server has no built-in authentication. It is intended to run on localhost or behind a network control you provide. In the reference Azure deployment, access is limited to Azure Front Door through an `X-Azure-FDID` check. Content retrieved from websites is untrusted input and may contain text that tries to manipulate an AI assistant (prompt injection). Treat tool results accordingly.
+
+Please report vulnerabilities privately, not in public issues. Use GitHub's "Report a vulnerability" feature on this repository (see [SECURITY.md](SECURITY.md)).
+
+## Reference deployment
+
+The Azure files (`azure.yaml`, `infra/`) are a **reference deployment** and are provided without warranty. Running them creates billable Azure resources in your own subscription, and you are responsible for the cost and for securing the deployment. Review and adapt the configuration (network, WAF, scaling and logging) to your own requirements before using it in production.
+
+## Contributing
+
+Contributions are welcome through pull requests. Please sign off your commits (`git commit -s`) in line with the [Developer Certificate of Origin](https://developercertificate.org/); by contributing, you agree that your contribution is licensed under this project's MIT license. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 

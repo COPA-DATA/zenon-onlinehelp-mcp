@@ -14,3 +14,7 @@ Thumbs.db
 .vscode/
 .idea/
 .azure
+
+# Claude Code local state
+.claude/
+Claude outputs/
