@@ -12,6 +12,7 @@ path = [
   "README.md",
   "SECURITY.md",
   "CONTRIBUTING.md",
+  "THIRD_PARTY_NOTICES.md",
   "REUSE.toml",
   "infra/**",
   ".github/**",
