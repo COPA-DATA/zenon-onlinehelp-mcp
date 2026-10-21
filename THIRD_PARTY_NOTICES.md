@@ -24,7 +24,7 @@ Total: 96 packages.
 |---|---|---|---|
 | @hono/node-server | 2.1.1 | MIT | https://github.com/honojs/node-server |
 | @mixmark-io/domino | 2.2.0 | BSD-2-Clause | https://github.com/mixmark-io/domino |
-| @modelcontextprotocol/sdk | 1.30.0 | MIT | https://github.com/modelcontextprotocol/typescript-sdk |
+| @modelcontextprotocol/sdk | 1.32.1 | MIT | https://github.com/modelcontextprotocol/typescript-sdk |
 | accepts | 2.0.0 | MIT | https://github.com/jshttp/accepts |
 | ajv | 8.20.0 | MIT | https://github.com/ajv-validator/ajv |
 | ajv-formats | 3.0.1 | MIT | https://github.com/ajv-validator/ajv-formats |
@@ -54,7 +54,7 @@ Total: 96 packages.
 | express | 5.2.1 | MIT | https://github.com/expressjs/express |
 | express-rate-limit | 8.7.0 | MIT | https://github.com/express-rate-limit/express-rate-limit |
 | fast-deep-equal | 3.1.3 | MIT | https://github.com/epoberezkin/fast-deep-equal |
-| fast-uri | 3.1.7 | BSD-3-Clause | https://github.com/fastify/fast-uri |
+| fast-uri | 3.1.9 | BSD-3-Clause | https://github.com/fastify/fast-uri |
 | finalhandler | 2.1.1 | MIT | https://github.com/pillarjs/finalhandler |
 | forwarded | 0.2.0 | MIT | https://github.com/jshttp/forwarded |
 | fresh | 2.0.0 | MIT | https://github.com/jshttp/fresh |
@@ -64,11 +64,11 @@ Total: 96 packages.
 | gopd | 1.2.0 | MIT | https://github.com/ljharb/gopd |
 | has-symbols | 1.1.0 | MIT | https://github.com/inspect-js/has-symbols |
 | hasown | 2.0.4 | MIT | https://github.com/inspect-js/hasOwn |
-| hono | 4.13.7 | MIT | https://github.com/honojs/hono |
+| hono | 4.13.13 | MIT | https://github.com/honojs/hono |
 | http-errors | 2.0.1 | MIT | https://github.com/jshttp/http-errors |
 | iconv-lite | 0.7.3 | MIT | https://github.com/pillarjs/iconv-lite |
 | inherits | 2.0.4 | ISC | https://github.com/isaacs/inherits |
-| ip-address | 10.7.0 | MIT | https://github.com/beaugunderson/ip-address |
+| ip-address | 10.7.4 | MIT | https://github.com/beaugunderson/ip-address |
 | ipaddr.js | 1.9.1 | MIT | https://github.com/whitequark/ipaddr.js |
 | is-promise | 4.0.0 | MIT | https://github.com/then/is-promise |
 | isexe | 2.0.0 | ISC | https://github.com/isaacs/isexe |
@@ -92,7 +92,7 @@ Total: 96 packages.
 | pkce-challenge | 5.0.1 | MIT | https://github.com/crouchcd/pkce-challenge |
 | playwright | 1.63.0 | Apache-2.0 | https://github.com/microsoft/playwright |
 | playwright-core | 1.63.0 | Apache-2.0 | https://github.com/microsoft/playwright |
-| proxy-addr | 2.0.7 | MIT | https://github.com/jshttp/proxy-addr |
+| proxy-addr | 2.0.8 | MIT | https://github.com/jshttp/proxy-addr |
 | qs | 6.16.0 | BSD-3-Clause | https://github.com/ljharb/qs |
 | range-parser | 1.3.0 | MIT | https://github.com/jshttp/range-parser |
 | raw-body | 3.0.2 | MIT | https://github.com/stream-utils/raw-body |
