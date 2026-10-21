@@ -1,7 +1,24 @@
 {
   "name": "zenon-docs-mcp",
   "version": "0.1.0",
-  "description": "MCP server exposing the zenon Online Help (onlinehelp.copadata.com) as search/fetch tools, similar to the Microsoft Learn MCP server.",
+  "description": "MCP server that exposes the zenon Online Help as search and fetch tools for AI assistants.",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "zenon",
+    "copa-data",
+    "documentation",
+    "ai"
+  ],
+  "homepage": "https://github.com/COPA-DATA/zenon-onlinehelp-mcp#readme",
+  "bugs": {
+    "url": "https://github.com/COPA-DATA/zenon-onlinehelp-mcp/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/COPA-DATA/zenon-onlinehelp-mcp.git"
+  },
+  "author": "Ing. Punzenberger COPA-DATA GmbH",
   "license": "MIT",
   "type": "module",
   "bin": {
