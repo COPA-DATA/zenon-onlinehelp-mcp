@@ -309,6 +309,18 @@ This server has no built-in authentication. It is intended to run on localhost o
 
 Please report vulnerabilities privately, not in public issues. Use GitHub's "Report a vulnerability" feature on this repository (see [SECURITY.md](SECURITY.md)).
 
+## Hardening possibilities
+
+The server is intended for public documentation and keeps its attack surface small: the fetch tools only request pages from the documentation sites, using URLs the server builds itself from validated parameters. The following changes would harden it further. They are options, not known defects, and are not implemented yet.
+
+- **Input limits:** set a maximum length for the `query` parameter and add a format check for the copatools `articleId`, as is already done for the zenon topic `id`.
+- **Timeouts and size caps:** add a request timeout and a response-size limit to the `docs-api-cd.copatools.com` calls so a slow or oversized upstream response cannot hold a request open.
+- **Restrict the browser:** limit headless Chromium (zenon source) to the `onlinehelp.copadata.com` origin, so redirects or embedded resources cannot make it load other hosts.
+- **Identify the client:** send a descriptive user-agent such as `zenon-docs-mcp/<version> (+https://github.com/COPA-DATA/zenon-onlinehelp-mcp)` so the documentation site operators can recognize and contact you.
+- **Rate limits:** the reference deployment allows 300 requests per minute per client IP (`rateLimitPerMinute` in [infra/modules/front-door.bicep](infra/modules/front-door.bicep)). For the Chromium-backed zenon source this is generous. Consider a lower limit, a cap on concurrent browser pages, and a lower `scaleMaxReplicas`, to protect both your deployment and the documentation site.
+- **Container:** run the container as a non-root user. The image currently sets `PLAYWRIGHT_CHROMIUM_NO_SANDBOX=1`, relying on container isolation instead of Chromium's own sandbox. A seccomp profile or a dedicated sandbox-capable setup can remove that need.
+- **Authentication:** if you expose a deployment beyond public documentation use, add authentication (for example OAuth or an API key at Front Door) instead of relying on network controls alone.
+
 ## Reference deployment
 
 The Azure files (`azure.yaml`, `infra/`) are a **reference deployment** and are provided without warranty. Running them creates billable Azure resources in your own subscription, and you are responsible for the cost and for securing the deployment. Review and adapt the configuration (network, WAF, scaling and logging) to your own requirements before using it in production.
